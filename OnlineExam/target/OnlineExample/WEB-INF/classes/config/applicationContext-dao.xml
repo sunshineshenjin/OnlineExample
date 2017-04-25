@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                             http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           ">
+
+    <!--                   配置数据库连接池 -->
+    <context:property-placeholder location="classpath:jdbcInfo.properties"/>
+    <bean id="dataSourse" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="jdbcUrl" value="${url}"/>
+        <property name="driverClass" value="${driver}"/>
+        <property name="acquireIncrement" value="5"/>
+        <property name="maxPoolSize" value="50"/>
+        <property name="initialPoolSize" value="5"/>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" scope="singleton">
+        <property name="dataSource" ref="dataSourse" />
+        <property name="configLocation" value="classpath:mybatis/mybatis-configuration.xml"></property>
+    </bean>
+
+    <!-- 配置mapper代理开发 ,需要指定mapperInterface接口类型和sqlsessionFactory
+     class要指定org.mybatis.spring.mapper.MapperFactoryBean,这个类会自动根据我们的接mapper和mapper.xml生成代理
+     可以手动配置也可以使用动态扫描-->
+    <!--  <bean id="studentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+         <property name="mapperInterface" value="com.leige.dao.mapper.StudentMapper"/>
+           <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+     </bean> -->
+
+    <!--
+    或者指定包扫描
+     使用MapperScannerConfigurer扫描mapper
+    扫描器将mapper扫描出来自动 注册到spring容器，bean的id是类名(首字母小写)
+     -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 指定扫描的包
+        如果扫描多个包中间使用半角逗号分隔
+        如果使用扫描器，不用在sqlmapconfig.xml中去配置mapper的扫描了，如果使用mapper代理的开发，在SqlMapConfig.xml中不用配置mapper项了
+        -->
+        <property name="basePackage" value="com.leige.dao.mapper"/>
+        <!-- 使用sqlSessionFactoryBeanName注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--
+        注意： 这里使用sqlSessionFactoryBeanName而不使用sqlSessionFactory原因如下：
+MapperScannerConigurer在扫描mapper时需要注入 sqlSessionFactory，如果使用
+<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+会存在PropertyPlaceholderConfigurer还没来得及替换dataSource定义中的${jdbc.driver}
+等数据源变量就注入到了MapperScannerConigurer中，将导致数据库连接不上，如果改为如下方式可以解决问题：
+        名称就是就是mapper名称首字母小写
+         -->
+
+    </bean>
+
+</beans>

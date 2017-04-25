@@ -31,7 +31,7 @@
     </tx:advice>
 
 
-    <!-- 3.配置切面 http://blog.csdn.net/do_bset_yourself/article/details/51298799-->
+    <!-- 3.配置切面 -->
     <aop:config>
         <aop:pointcut expression="execution(* com.leige.service.impl.*.*(..))" id="studentPoint"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="studentPoint"/>

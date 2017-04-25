@@ -15,7 +15,7 @@
 
         <!-- 1.配置注解处理器映射器和处理器适配器 ,也就是说controler开发使用使用注解,千万别忘记配置spring的注解扫描-->
         <mvc:annotation-driven/>
-        <context:component-scan base-package="com.leige.controler"/>
+        <context:component-scan base-package="com.controller"/>
 
         <!-- 2.配置视图解析器 支持jsp-->
         <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -23,7 +23,7 @@
             和modelandview拼接成一个完整的urlmodelAndView.setViewName("index");
             /index.jsp
             -->
-            <property name="prefix" value="/"/>
+            <property name="prefix" value="/view/"/>
             <!-- 视图后缀 -->
             <property name="suffix" value=".jsp" ></property>
         </bean>

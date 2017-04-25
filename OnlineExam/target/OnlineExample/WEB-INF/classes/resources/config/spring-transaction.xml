@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                             http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           ">
+    <!--         1. 配置事务管理器 ,将事务交给spring管理-->
+    <!--            <tx:annotation-driven /> -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourse"/>
+    </bean>
+    <!--           2. 配置通知  ,事务详情,添加要被管理的方法     -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes >
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="select*" read-only="true"/>
+
+        </tx:attributes>
+    </tx:advice>
+
+
+    <!-- 3.配置切面 -->
+    <aop:config>
+        <aop:pointcut expression="execution(* com.leige.service.impl.*.*(..))" id="studentPoint"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="studentPoint"/>
+    </aop:config>
+
+
+</beans>
